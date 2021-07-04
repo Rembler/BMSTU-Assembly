@@ -1,0 +1,206 @@
+Microsoft (R) Macro Assembler Version 6.14.8444		    05/16/21 23:47:01
+C:\Programming\MDL_lab05\MDL_lab05\Lab05.Asm		     Page 1 - 1
+
+
+				; Template for console application
+				         .586
+				         .MODEL  flat
+
+ 00000000			         .DATA
+ 00000000  00000064 [		CurWord  DB    100 DUP (0)
+	    00
+	   ]
+ 00000064  00000064 [		SameWord DB    100 DUP (0)
+	    00
+	   ]
+ 000000C8  000000FF [		Result   DB    255 DUP (0)
+	    00
+	   ]
+
+ 00000000			         .CODE
+				public _STR_SAME
+				externdef _PRINT@4:near
+ 00000000			_STR_SAME proc
+ 00000000  8D 0D 000000C8 R	         lea    ECX,Result
+ 00000006  8B 74 24 04		         mov    ESI,[ESP+4]
+ 0000000A  4E			         dec    ESI
+ 0000000B			next_word:
+ 0000000B  46			         inc    ESI
+ 0000000C  B0 00		         mov    AL,0
+ 0000000E  8D 3D 00000000 R	         lea    EDI,CurWord
+ 00000014			clear_word:
+ 00000014  80 3F 00		         cmp    BYTE PTR [EDI],0
+ 00000017  74 03		         je     no_copied_word
+ 00000019  AA			            stosb
+ 0000001A  EB F8		            jmp     clear_word
+ 0000001C			no_copied_word:
+ 0000001C  8D 3D 00000000 R	         lea    EDI,CurWord
+ 00000022			copy_word:
+ 00000022  80 3E 00		         cmp    BYTE PTR [ESI],0
+ 00000025  0F 84 000000BB	         je     end_of_line
+ 0000002B  80 3E 20		            cmp    BYTE PTR [ESI],20h
+ 0000002E  74 03		            je     end_of_word
+ 00000030  A4			                movsb
+ 00000031  EB EF		                jmp    copy_word
+ 00000033			end_of_word:
+ 00000033  56			         push   ESI
+ 00000034			check_next_word:
+ 00000034  46			         inc    ESI
+ 00000035  80 3E 00		         cmp    BYTE PTR [ESI],0
+ 00000038  75 03		         jne      not_the_end
+ 0000003A  5E			            pop     ESI
+ 0000003B  EB CE		            jmp     next_word
+ 0000003D			not_the_end:
+ 0000003D  56			         push   ESI
+ 0000003E  BB 00000000		         mov    EBX,0
+ 00000043  8D 3D 00000000 R	         lea    EDI,CurWord
+ 00000049			word_cmp:
+ 00000049  80 3F 00		         cmp    BYTE PTR [EDI],0
+ 0000004C  74 10		         je     kudato
+ 0000004E  80 3E 0A		            cmp     BYTE PTR [ESI],0ah
+ 00000051  74 0B		            je      kudato
+ 00000053  80 3E 20		                cmp     BYTE PTR [ESI],20h
+ 00000056  74 06		                je      kudato
+ 00000058  A6			                    cmpsb
+ 00000059  74 01		                    je  no_inc
+ 0000005B  43			                        inc     EBX
+ 0000005C			no_inc:
+ 0000005C  EB EB		                    jmp     word_cmp
+ 0000005E			kudato:
+ 0000005E  80 3F 00		        cmp     BYTE PTR [EDI],0
+ 00000061  75 6B		        jne     not_the_same
+ 00000063  80 3E 20		            cmp     BYTE PTR [ESI],20h
+ 00000066  74 05		            je     check_ebx
+ 00000068  80 3E 0A		                cmp     BYTE PTR [ESI],0ah
+ 0000006B  75 61		                jne     not_the_same
+ 0000006D			check_ebx:
+ 0000006D  83 FB 01		                cmp     EBX,1
+ 00000070  7F 5C		                jg      not_the_same
+ 00000072  8B F9		                     mov     EDI,ECX
+ 00000074  8D 35 00000000 R	                     lea     ESI,CurWord
+ 0000007A			cur_to_res:
+ 0000007A  80 3E 00		                     cmp     BYTE PTR [ESI],0
+ 0000007D  74 03		                     je      cur_to_res_end
+ 0000007F  A4			                        movsb
+ 00000080  EB F8		                        jmp     cur_to_res
+ 00000082			cur_to_res_end:  
+ 00000082  B0 20		                     mov     AL,20h
+ 00000084  AA			                     stosb
+ 00000085  B0 2D		                     mov     AL,'-'
+ 00000087  AA			                     stosb
+ 00000088  B0 20		                     mov     AL,20h
+ 0000008A  AA			                     stosb
+ 0000008B  B0 00		                     mov     AL,0
+ 0000008D  8B CF		                     mov     ECX,EDI
+ 0000008F  5E			                    pop     ESI
+ 00000090  8D 3D 00000064 R	                    lea     EDI,SameWord
+ 00000096			copy_copy_word:
+ 00000096  80 3E 20		                    cmp     BYTE PTR [ESI],20h
+ 00000099  74 08		                    je      copy_word_end
+ 0000009B  80 3E 0A		                        cmp     BYTE PTR [ESI],0ah
+ 0000009E  74 03		                        je      copy_word_end
+ 000000A0  A4			                            movsb
+ 000000A1  EB F3		                            jmp     copy_copy_word
+ 000000A3			copy_word_end:
+ 000000A3  B0 00		         mov    AL,0
+ 000000A5  80 3F 00		         cmp    BYTE PTR [EDI],0
+ 000000A8  74 03		         je     no_del
+ 000000AA  AA			            stosb
+ 000000AB  EB F6		            jmp copy_word_end
+ 000000AD			no_del:
+ 000000AD  8B F9		         mov    EDI,ECX
+ 000000AF  56			         push   ESI
+ 000000B0  8D 35 00000064 R	         lea    ESI,SameWord
+ 000000B6			same_to_res:
+ 000000B6  80 3E 00		         cmp     BYTE PTR [ESI],0
+ 000000B9  74 03		         je      same_to_res_end
+ 000000BB  A4			            movsb
+ 000000BC  EB F8		            jmp     same_to_res
+ 000000BE			same_to_res_end:  
+ 000000BE  B0 3B		         mov    AL,';'
+ 000000C0  AA			         stosb
+ 000000C1  B0 20		         mov    AL,20h
+ 000000C3  AA			         stosb
+ 000000C4  B0 00		         mov    AL,0
+ 000000C6  5E			         pop    ESI
+ 000000C7  8B CF		         mov    ECX,EDI
+ 000000C9  E9 FFFFFF66		         jmp    check_next_word          
+ 000000CE			not_the_same:
+ 000000CE  83 C4 04		         add    ESP,4
+ 000000D1			reach_the_end:
+ 000000D1  80 3E 20		         cmp    BYTE PTR [ESI],20h
+ 000000D4  0F 84 FFFFFF5A	         je     check_next_word
+ 000000DA  80 3E 0A		            cmp     BYTE PTR [ESI],0ah
+ 000000DD  0F 84 FFFFFF51	            je      check_next_word
+ 000000E3  46			                inc     ESI
+ 000000E4  EB EB		                jmp     reach_the_end
+ 000000E6			end_of_line:
+ 000000E6  8D 05 000000C8 R	         lea    EAX,Result
+ 000000EC  50			         push   EAX
+ 000000ED  E8 00000000 E	         call   _PRINT@4
+ 000000F2  C3			         ret
+ 000000F3			_STR_SAME endp
+				end
+Microsoft (R) Macro Assembler Version 6.14.8444		    05/16/21 23:47:01
+C:\Programming\MDL_lab05\MDL_lab05\Lab05.Asm		     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+_DATA  . . . . . . . . . . . . .	32 Bit	 000001C7 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000000F3 Para	  Public  'CODE'	
+
+
+Procedures,  parameters and locals:
+
+                N a m e                 Type     Value    Attr
+
+_STR_SAME  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000000F3 Public
+  next_word  . . . . . . . . . .	L Near	 0000000B _TEXT	
+  clear_word . . . . . . . . . .	L Near	 00000014 _TEXT	
+  no_copied_word . . . . . . . .	L Near	 0000001C _TEXT	
+  copy_word  . . . . . . . . . .	L Near	 00000022 _TEXT	
+  end_of_word  . . . . . . . . .	L Near	 00000033 _TEXT	
+  check_next_word  . . . . . . .	L Near	 00000034 _TEXT	
+  not_the_end  . . . . . . . . .	L Near	 0000003D _TEXT	
+  word_cmp . . . . . . . . . . .	L Near	 00000049 _TEXT	
+  no_inc . . . . . . . . . . . .	L Near	 0000005C _TEXT	
+  kudato . . . . . . . . . . . .	L Near	 0000005E _TEXT	
+  check_ebx  . . . . . . . . . .	L Near	 0000006D _TEXT	
+  cur_to_res . . . . . . . . . .	L Near	 0000007A _TEXT	
+  cur_to_res_end . . . . . . . .	L Near	 00000082 _TEXT	
+  copy_copy_word . . . . . . . .	L Near	 00000096 _TEXT	
+  copy_word_end  . . . . . . . .	L Near	 000000A3 _TEXT	
+  no_del . . . . . . . . . . . .	L Near	 000000AD _TEXT	
+  same_to_res  . . . . . . . . .	L Near	 000000B6 _TEXT	
+  same_to_res_end  . . . . . . .	L Near	 000000BE _TEXT	
+  not_the_same . . . . . . . . .	L Near	 000000CE _TEXT	
+  reach_the_end  . . . . . . . .	L Near	 000000D1 _TEXT	
+  end_of_line  . . . . . . . . .	L Near	 000000E6 _TEXT	
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000000h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+CurWord  . . . . . . . . . . . .	Byte	 00000000 _DATA	
+Result . . . . . . . . . . . . .	Byte	 000000C8 _DATA	
+SameWord . . . . . . . . . . . .	Byte	 00000064 _DATA	
+_PRINT@4 . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+
+	   0 Warnings
+	   0 Errors

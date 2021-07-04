@@ -1,0 +1,8 @@
+﻿  MDL_HW2.cpp
+C:\Programming\MDL_HW2\MDL_HW2\MDL_HW2.cpp(272,62): warning C4305: 'argument': truncation from 'int' to 'const _Elem'
+          with
+          [
+              _Elem=char
+          ]
+C:\Programming\MDL_HW2\MDL_HW2\MDL_HW2.cpp(272,58): warning C4309: 'argument': truncation of constant value
+  MDL_HW2.vcxproj -> C:\Programming\MDL_HW2\Debug\MDL_HW2.exe
